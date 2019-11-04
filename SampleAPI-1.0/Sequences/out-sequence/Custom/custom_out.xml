@@ -1,0 +1,5 @@
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="custom_out">  
+	<log level="custom">    
+		<property name="logMessage" value="Inside custom out path"/>
+	</log>
+</sequence>

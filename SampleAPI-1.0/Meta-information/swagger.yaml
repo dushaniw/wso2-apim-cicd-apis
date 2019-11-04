@@ -1,0 +1,69 @@
+openapi: 3.0.1
+info:
+  title: SampleAPI
+  version: "1.0"
+servers:
+ -
+  url: /
+security:
+ -
+  default: []
+paths:
+  /*:
+    get:
+      responses:
+        200:
+          description: OK
+      security:
+       -
+        default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+    put:
+      responses:
+        200:
+          description: OK
+      security:
+       -
+        default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+    post:
+      responses:
+        200:
+          description: OK
+      security:
+       -
+        default:
+         - SampleScope
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+    delete:
+      responses:
+        200:
+          description: OK
+      security:
+       -
+        default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+    patch:
+      responses:
+        200:
+          description: OK
+      security:
+       -
+        default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes:
+            SampleScope: sample scope description
+          x-scopes-bindings:
+            SampleScope: admin

@@ -1,0 +1,39 @@
+environments:
+    - name: dev
+      endpoints:
+        production:
+          url: http://www.mocky.io/v2/5dc00c133100006e7cbe3daa
+          config:
+            retryTimeOut: 3
+            retryDelay: 100
+            factor: 1
+        sandbox:
+          url: http://www.mocky.io/v2/5dc00c223100002b00be3dab
+      gatewayEnvironments:
+        - Production and Sandbox           
+      certs:
+        - hostName: http://www.mocky.io/v2/5dc00c223100002b00be3dab
+          alias: mocky-sand
+          path: <certificate_file_path>
+        - hostName: http://www.mocky.io/v2/5dc00c133100006e7cbe3daa
+          alias: mocky-prod
+          path: /home/dushaniw/WSO2/Rnd/3.0/testing/dev
+    - name: prod
+      endpoints:
+        production:
+          url: http://www.mocky.io/v2/5dc083da3100006405be4183
+          config:
+            retryTimeOut: 5
+            retryDelay: 50
+            factor: 2
+        sandbox:
+          url: http://www.mocky.io/v2/5dc083eb3100007107be4184
+      gatewayEnvironments:
+        - Production and Sandbox           
+      certs:
+        - hostName: http://www.mocky.io/v2/5dc083da3100006405be4183
+          alias: mocky-sand-sand
+          path: <certificate_file_path>
+        - hostName: http://www.mocky.io/v2/5dc083eb3100007107be4184
+          alias: mocky-prod-sand
+          path: /home/dushaniw/WSO2/Rnd/3.0/testing/dev

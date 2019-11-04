@@ -1,0 +1,96 @@
+id:
+  providerName: creator
+  apiName: SampleAPI
+  version: "1.0"
+uuid: 39a291a4-77a9-4846-92db-e8524e2f5489
+type: HTTP
+context: /sample/1.0
+contextTemplate: /sample/{version}
+tags:
+ - sample
+documents: []
+lastUpdated: Nov 4, 2019 5:06:43 PM
+availableTiers:
+ -
+  name: Bronze
+  displayName: Bronze
+  description: Allows 1000 requests per minute
+  requestsPerMin: 1000
+  requestCount: 1000
+  unitTime: 1
+  timeUnit: min
+  tierPlan: FREE
+  stopOnQuotaReached: true
+ -
+  name: Gold
+  displayName: Gold
+  description: Allows 5000 requests per minute
+  requestsPerMin: 5000
+  requestCount: 5000
+  unitTime: 1
+  timeUnit: min
+  tierPlan: FREE
+  stopOnQuotaReached: true
+availableSubscriptionLevelPolicies: []
+apiLevelPolicy: Unlimited
+uriTemplates: []
+apiHeaderChanged: false
+apiResourcePatternsChanged: false
+status: PUBLISHED
+technicalOwner: Tech Owner
+technicalOwnerEmail: techowner@mail.com
+businessOwner: Business Owner
+businessOwnerEmail: businessowner@mail.com
+visibility: public
+gatewayLabels: []
+endpointSecured: true
+endpointAuthDigest: false
+endpointUTUsername: admin
+endpointUTPassword: ""
+transports: http,https
+inSequence: custom_in
+outSequence: custom_out
+faultSequence: json_fault
+advertiseOnly: false
+subscriptionAvailability: all_tenants
+corsConfiguration:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+   - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+   - authorization
+   - Access-Control-Allow-Origin
+   - Content-Type
+   - SOAPAction
+  accessControlAllowMethods:
+   - GET
+   - PUT
+   - POST
+   - DELETE
+   - PATCH
+   - OPTIONS
+endpointConfig: '{"endpoint_type":"http","sandbox_endpoints":{"url":"http://www.mocky.io/v2/5dc00c223100002b00be3dab"},"failOver":"False","production_endpoints":{"config":{"retryDelay":"100","actionDuration":"300","retryTimeOut":"3","suspendDuration":"10","suspendErrorCode":["101510"],"retryErroCode":["101508"],"factor":"1","suspendMaxDuration":"10","actionSelect":"fault"},"url":"http://www.mocky.io/v2/5dc00c133100006e7cbe3daa"}}'
+responseCache: Disabled
+cacheTimeout: 300
+implementation: ENDPOINT
+authorizationHeader: Authorization
+scopes: []
+isDefaultVersion: false
+isPublishedDefaultVersion: false
+environments:
+ - Production and Sandbox
+createdTime: "1572866149240"
+additionalProperties:
+  sample-property: sample value
+monetizationProperties: {}
+isMonetizationEnabled: false
+environmentList:
+ - SANDBOX
+ - PRODUCTION
+apiSecurity: oauth2,oauth_basic_auth_api_key_mandatory
+endpoints: []
+enableSchemaValidation: false
+accessControl: all
+rating: 0.0
+isLatest: true
