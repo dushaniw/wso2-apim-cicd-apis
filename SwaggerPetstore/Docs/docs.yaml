@@ -1,0 +1,8 @@
+ -
+  type: HOWTO
+  name: PetStore
+  summary: API Documentation for Swagger PetStore API
+  sourceType: URL
+  sourceUrl: https://petstore.swagger.io/
+  visibility: API_LEVEL
+  lastUpdated: Dec 06, 2019 2:19:38 AM
