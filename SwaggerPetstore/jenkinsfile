@@ -8,7 +8,7 @@ pipeline {
         stage('Setup APIM Environments'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'apim', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '/var/jenkins_home/config.sh'                        
+                    sh './SwaggerPetstore/config.sh'                        
                 }
             }
         }
