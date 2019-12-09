@@ -1,0 +1,546 @@
+{
+	"info": {
+		"_postman_id": "b1488a08-bd50-4ba7-8215-53b6273bb10b",
+		"name": "Sample Store",
+		"description": "This is a sample server online store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "/products",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bab4cbad-7633-48d0-af23-cf5f4ed0cdea",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2482982e-9382-458e-8306-519eb66cd848",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type header is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Product List is non empty\", function () {",
+									"    pm.expect(jsonData.total).to.be.above(0);",
+									"});",
+									"",
+									"var Ajv = require('ajv'),",
+									"    ajv = new Ajv({logger: console}),",
+									"    schema = {",
+									"        \"properties\": {",
+									"            \"id\": {",
+									"                \"type\": \"integer\"",
+									"            },",
+									"            \"name\": {",
+									"                \"type\": \"string\"",
+									"            },",
+									"            \"description\": {",
+									"                \"type\" : \"string\"",
+									"            },",
+									"            \"price\": {",
+									"                \"type\" : \"string\"",
+									"            }",
+									"        }",
+									"    };",
+									"",
+									"pm.test('Product Schema is valid', function() {",
+									"    jsonData.list.forEach(prod => {",
+									"        pm.expect(ajv.validate(schema, prod)).to.be.true;",
+									"    }",
+									"    );",
+									"});",
+									"",
+									"",
+									"pm.globals.set(\"no_of_products\", jsonData.list.length);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?start=<string>&count=<string>&params=<string>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "<string>"
+								},
+								{
+									"key": "count",
+									"value": "<string>"
+								},
+								{
+									"key": "params",
+									"value": "<string>"
+								}
+							]
+						},
+						"description": "Get Product List"
+					},
+					"response": [
+						{
+							"name": "OK.\nList of Products is returned.\n",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products?start=<string>&count=<string>&params=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "<string>"
+										},
+										{
+											"key": "count",
+											"value": "<string>"
+										},
+										{
+											"key": "params",
+											"value": "<string>"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"list\": [\n  {\n   \"id\": \"<long>\",\n   \"name\": \"<string>\",\n   \"description\": \"<string>\",\n   \"price\": \"<string>\"\n  },\n  {\n   \"id\": \"<long>\",\n   \"name\": \"<string>\",\n   \"description\": \"<string>\",\n   \"price\": \"<string>\"\n  }\n ],\n \"total\": \"<long>\",\n \"offset\": \"<long>\",\n \"limit\": \"<long>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b7bd36ce-fe3c-4879-8d5f-c5f0a249858a",
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"var Ajv = require('ajv'),",
+									"    ajv = new Ajv({logger: console}),",
+									"    schema = {",
+									"        \"properties\": {",
+									"            \"id\": {",
+									"                \"type\": \"integer\"",
+									"            },",
+									"            \"name\": {",
+									"                \"type\": \"string\"",
+									"            },",
+									"            \"description\": {",
+									"                \"type\" : \"string\"",
+									"            },",
+									"            \"price\": {",
+									"                \"type\" : \"string\"",
+									"            }",
+									"        }",
+									"    };",
+									"",
+									"pm.test('Product Schema is valid', function() {",
+									"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Product Id is valid\", function () {",
+									"    pm.expect(jsonData.id).to.eql(pm.globals.get(\"no_of_products\")+1);",
+									"});",
+									"",
+									"pm.globals.set(\"newly_added_product_id\", jsonData.id);",
+									"pm.globals.set(\"newly_added_product_name\", jsonData.name);",
+									"pm.globals.set(\"newly_added_product_description\", jsonData.description);",
+									"pm.globals.set(\"newly_added_product_price\", jsonData.price);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Floral Sleeveless Blouse\",\n    \"description\": \"Womens Cotton Floral Sleeveless Blouse\",\n    \"price\": \"$99.00\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						},
+						"description": "Add a Product"
+					},
+					"response": [
+						{
+							"name": "Bad Request.\nInvalid request or validation error.\n",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"<long>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"price\": \"<string>\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": \"<long>\",\n \"message\": \"<string>\",\n \"description\": \"<string>\"\n}"
+						},
+						{
+							"name": "Unsupported Media Type.\nThe entity of the request was in a not supported format.\n",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"<long>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"price\": \"<string>\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"status": "Unsupported Media Type",
+							"code": 415,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": \"<long>\",\n \"message\": \"<string>\",\n \"description\": \"<string>\"\n}"
+						},
+						{
+							"name": "Created.\nSuccessful response with the newly created object as entity in the body.\n",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"<long>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"price\": \"<string>\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"id\": \"<long>\",\n \"name\": \"<string>\",\n \"description\": \"<string>\",\n \"price\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/products/:productId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1492d368-b417-4035-b712-0c06276ceb61",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"var Ajv = require('ajv'),",
+									"    ajv = new Ajv({logger: console}),",
+									"    schema = {",
+									"        \"properties\": {",
+									"            \"id\": {",
+									"                \"type\": \"integer\"",
+									"            },",
+									"            \"name\": {",
+									"                \"type\": \"string\"",
+									"            },",
+									"            \"description\": {",
+									"                \"type\" : \"string\"",
+									"            },",
+									"            \"price\": {",
+									"                \"type\" : \"string\"",
+									"            }",
+									"        }",
+									"    };",
+									"",
+									"pm.test('Product Schema is valid', function() {",
+									"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Product Id is valid\", function () {",
+									"    pm.expect(jsonData.id).to.eql(pm.globals.get(\"newly_added_product_id\"));",
+									"});",
+									"",
+									"pm.test(\"Product Name is valid\", function () {",
+									"    pm.expect(jsonData.name).to.eql(pm.globals.get(\"newly_added_product_name\"));",
+									"});",
+									"",
+									"pm.test(\"Product Desc is valid\", function () {",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"newly_added_product_description\"));",
+									"});",
+									"",
+									"pm.test(\"Product price is valid\", function () {",
+									"    pm.expect(jsonData.price).to.eql(pm.globals.get(\"newly_added_product_price\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/:newly_added_product_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								":newly_added_product_id"
+							],
+							"variable": [
+								{
+									"key": "newly_added_product_id",
+									"value": "{{newly_added_product_id}}"
+								}
+							]
+						},
+						"description": "Get a Product"
+					},
+					"response": [
+						{
+							"name": "OK.\nProduct is returned.\n",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										"<string>"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"id\": \"<long>\",\n \"name\": \"<string>\",\n \"description\": \"<string>\",\n \"price\": \"<string>\"\n}"
+						},
+						{
+							"name": "Internal Server Error\nError while getting product\n",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										"<string>"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": \"<long>\",\n \"message\": \"<string>\",\n \"description\": \"<string>\"\n}"
+						},
+						{
+							"name": "Not Found\nInvalid product Id.\n",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"products",
+										"<string>"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": \"<long>\",\n \"message\": \"<string>\",\n \"description\": \"<string>\"\n}"
+						}
+					]
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0aaa43f3-6e74-4488-9e1e-d9df9bd5090f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a25e4ba7-6905-40a6-8a4b-cfdd98698715",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "fb418e8e-03f6-4f15-b76c-a193f0bc6bf4",
+			"key": "baseUrl",
+			"value": "http://localhost:9090/samplestore",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

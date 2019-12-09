@@ -1,0 +1,155 @@
+openapi: 3.0.1
+info:
+  title: Sample Store
+  description: 'This is a sample server online store'
+  version: 1.0.0
+servers:
+- url: http://localhost:9090/samplestore
+paths:
+    /products: 
+      get: 
+        description: "Get Product List"
+        parameters: 
+          - 
+            name: "start"
+            in: "query"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            name: "count"
+            in: "query"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            name: "params"
+            in: "query"
+            required: false
+            schema: 
+              type: "string"
+        responses: 
+          '200': 
+            description: |
+              OK.
+              List of Products is returned.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProductList'          
+      post: 
+        description: "Add a Product"
+        requestBody: 
+          description: Product object that needs to be added to the store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          required: true
+        responses:
+          '201':
+            description: |
+              Created.
+              Successful response with the newly created object as entity in the body.
+            content:
+              application/json:  
+                schema:
+                  $ref: '#/components/schemas/Product'
+          '400':
+            description: |
+              Bad Request.
+              Invalid request or validation error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          '415':
+            description: |
+              Unsupported Media Type.
+              The entity of the request was in a not supported format.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    /products/{productId}: 
+      get: 
+        description: "Get a Product"
+        parameters: 
+          - 
+            name: "productId"
+            in: "path"
+            required: true
+            schema: 
+              type: "string"
+              format: "string"
+        responses: 
+          '200': 
+            description: |
+              OK.
+              Product is returned.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Product' 
+          '404':
+            description: |
+              Not Found
+              Invalid product Id.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          '500':
+            description: |
+              Internal Server Error
+              Error while getting product
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'                  
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+    ProductList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+          format: int64
+        offset:
+          type: integer
+          format: int64
+        limit: 
+          type: integer
+          format: int64
+      xml:
+        name: Category
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int64
+        message:
+          type: string
+          description: Error message.
+        description:
+          type: string
+          description: |
+            A detail description about the error message.
+
