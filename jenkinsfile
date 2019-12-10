@@ -3,7 +3,7 @@ pipeline {
     tools {nodejs "node"}
     environment {
         CI = 'true'
-        API = './SampleStore'
+        API_DIR = './SampleStore'
         DEV_ENV = 'dev'
         PROD_ENV = 'prod'
         TEST_SCRIPT_FILE = 'sample.store.dev.postman_collection.json'        
@@ -26,13 +26,13 @@ pipeline {
                     sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
                 }
                 echo 'Deploying to $DEV_ENV'
-                sh 'apictl import-api -f $API -e $DEV_ENV -k --preserve-provider=false --update=true --verbose'
+                sh 'apictl import-api -f $API_DIR -e $DEV_ENV -k --preserve-provider=false --update=true --verbose'
             }
         }
         stage('Run Tests') {
             steps {
                 echo 'Running tests in $DEV_ENV'
-                sh 'newman run $API_DIR/sample.store.dev.postman_collection.json --insecure' 
+                sh 'newman run $API_DIR/$TEST_SCRIPT_FILE --insecure' 
             }
         }
         stage('Deploy to Production') {
@@ -45,7 +45,7 @@ pipeline {
                     sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                        
                 }
                 echo 'Deploying to Production'
-                sh 'apictl import-api -f $API -e $PROD_ENV -k --preserve-provider=false --update=true --verbose'
+                sh 'apictl import-api -f $API_DIR -e $PROD_ENV -k --preserve-provider=false --update=true --verbose'
             }
         }
     }

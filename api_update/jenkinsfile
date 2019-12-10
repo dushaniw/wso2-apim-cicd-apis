@@ -24,7 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running tests in $DEV_ENV'
-                sh 'newman run $API_DIR/sample.store.dev.postman_collection.json --insecure' 
+                sh 'newman run $API_DIR/$TEST_SCRIPT_FILE --insecure' 
             }
         }
         stage('Export from Dev') {
