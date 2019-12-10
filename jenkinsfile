@@ -16,29 +16,22 @@ pipeline {
                 credentialsId: 'dushaniw-git'
             }
         }
-        stage('Log into APIM Environments'){
-            steps{
-                sh 'echo "Logging into $DEV_ENV"'
-                withCredentials([usernamePassword(credentialsId: 'apim_dev', usernameVariable: 'DEV_USERNAME', passwordVariable: 'DEV_PASSWORD')]) {
-                    sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
-                }
-                sh 'echo "Logging into $PROD_ENV"'
-                withCredentials([usernamePassword(credentialsId: 'apim_prod', usernameVariable: 'PROD_USERNAME', passwordVariable: 'PROD_PASSWORD')]) {
-                    sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                        
-                }
-            }
-        }
         stage('Deploy to Dev') {
             environment{
                 RETRY = '80'
             }
             steps {
+                sh 'echo "Logging into $DEV_ENV"'
+                withCredentials([usernamePassword(credentialsId: 'apim_dev', usernameVariable: 'DEV_USERNAME', passwordVariable: 'DEV_PASSWORD')]) {
+                    sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
+                }
                 echo 'Deploying to Dev'
                 sh 'apictl import-api -f $API -e $DEV_ENV -k --preserve-provider=false --update=true --verbose'
             }
         }
         stage('Run Tests') {
             steps {
+                sh 'echo "Running tests in $DEV_ENV"'
                 sh 'newman run ./SampleStore/sample.store.dev.postman_collection.json --insecure' 
             }
         }
@@ -47,6 +40,10 @@ pipeline {
                 RETRY = '60'
             }
             steps {
+                sh 'echo "Logging into $PROD_ENV"'
+                withCredentials([usernamePassword(credentialsId: 'apim_prod', usernameVariable: 'PROD_USERNAME', passwordVariable: 'PROD_PASSWORD')]) {
+                    sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                        
+                }
                 echo 'Deploying to Production'
                 sh 'apictl import-api -f $API -e $PROD_ENV -k --preserve-provider=false --update=true --verbose'
             }
