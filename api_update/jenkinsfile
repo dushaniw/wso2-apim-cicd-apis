@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+    tools {nodejs "node"}
+    environment {
+        CI = 'true'
+        API_DIR = './SampleStore'
+        NAME = 'SampleStore'
+        PROVIDER = 'admin'
+        VERSION = '1.0.0'
+        API_PARAMS_FILE = 'api_params.yaml'
+        API_README_FILE = 'README.md'
+        TEST_SCRIPT_FILE = 'sample.store.dev.postman_collection.json'
+        API_CTL_EXPORTED_DIR = '/var/jenkins_home/.wso2apictl/exported/apis'
+        EXPORTED_API_ZIP = 'SampleStore_1.0.0.zip'
+    }
+    stages {
+        stage('Preparation') {
+            steps{
+                git branch: "master",
+                url: 'https://github.com/dushaniw/sample-store-demo.git',
+                credentialsId: 'dushaniw-git'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests in Dev'
+                sh 'newman run $API_DIR/sample.store.dev.postman_collection.json --insecure' 
+            }
+        }
+        stage('Export from Dev') {
+            environment{
+                ENV = 'dev'
+                RETRY = '80'
+            }
+            steps {
+                echo 'Logging into Dev'
+                withCredentials([usernamePassword(credentialsId: 'apim_dev', usernameVariable: 'DEV_USERNAME', passwordVariable: 'DEV_PASSWORD')]) {
+                    sh 'apictl login $ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
+                }
+                echo 'Export from Dev'
+                sh 'apictl export-api --name $NAME --provider $PROVIDER --version $VERSION -e $ENV -k --verbose'
+                sh 'unzip $API_CTL_EXPORTED_DIR/$ENV/$EXPORTED_API_ZIP'
+                sh '''#!/bin/bash +x
+                    if [ -f "$API_DIR/$API_PARAMS_FILE" ] ; then
+                        echo "$API_DIR/$API_PARAMS_FILE exists"
+                        cp $API_DIR/$API_PARAMS_FILE ./$NAME-$VERSION
+                    fi
+                    if [ -f "$API_DIR/$API_README_FILE" ] ; then
+                        echo "$API_DIR/$API_README_FILE exists"
+                        cp $API_DIR/$API_README_FILE ./$NAME-$VERSION
+                    fi
+                    if [ -f "$API_DIR/$TEST_SCRIPT_FILE" ] ; then
+                        echo "$API_DIR/$TEST_SCRIPT_FILE exists"
+                        cp $API_DIR/$TEST_SCRIPT_FILE ./$NAME-$VERSION
+                    fi
+                    rm -r $API_DIR
+                    mv $NAME-$VERSION $NAME'''
+            }
+        }
+        stage('Update SCM') {
+            steps {
+                echo 'Update SCM'
+                sh 'git add .'
+                withCredentials([usernamePassword(credentialsId: 'dushaniw-git', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+                    sh("git commit -m 'Applying latest dev changes ${BUILD_TAG}'") 
+                    sh("git push http://$USERNAME:$PASSWORD@github.com/dushaniw/sample-store-demo.git")
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            environment{
+                ENV = 'prod'
+                RETRY = '60'
+            }
+            steps {
+                echo 'Deploying to Production'
+                sh 'apictl import-api -f $API_DIR -e $ENV -k --preserve-provider=false --update=true --verbose'
+            }
+        }
+    }
+    post {
+        cleanup {
+            deleteDir()
+            dir("${workspace}@tmp") {
+                deleteDir()
+            }
+            dir("${workspace}@script") {
+                deleteDir()
+            }
+        }
+    }
+}

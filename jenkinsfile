@@ -5,8 +5,7 @@ pipeline {
         CI = 'true'
         API = './SampleStore'
         DEV_ENV = 'dev'
-        PROD_ENV = 'prod'
-        
+        PROD_ENV = 'prod'        
     }
     stages {
         stage('Preparation') {
