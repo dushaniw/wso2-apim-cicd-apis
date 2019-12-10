@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+    tools {nodejs "node"}
+    environment {
+        CI = 'true'
+        API = './SampleStore'
+        DEV_ENV = 'dev'
+        PROD_ENV = 'prod'
+        
+    }
+    stages {
+        stage('Preparation') {
+            steps{
+                git branch: "master",
+                url: 'https://github.com/dushaniw/sample-store-demo.git',
+                credentialsId: 'dushaniw-git'
+            }
+        }
+        stage('Log into APIM Environments'){
+            steps{
+                sh 'echo "Logging into $DEV_ENV"'
+                withCredentials([usernamePassword(credentialsId: 'apim_dev', usernameVariable: 'DEV_USERNAME', passwordVariable: 'DEV_PASSWORD')]) {
+                    sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
+                }
+                sh 'echo "Logging into $PROD_ENV"'
+                withCredentials([usernamePassword(credentialsId: 'apim_prod', usernameVariable: 'PROD_USERNAME', passwordVariable: 'PROD_PASSWORD')]) {
+                    sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                        
+                }
+            }
+        }
+        stage('Deploy to Dev') {
+            environment{
+                RETRY = '80'
+            }
+            steps {
+                echo 'Deploying to Dev'
+                sh 'apictl import-api -f $API -e $DEV_ENV -k --preserve-provider=false --update=true --verbose'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                sh 'newman run ./SampleStore/sample.store.dev.postman_collection.json --insecure' 
+            }
+        }
+        stage('Deploy to Production') {
+            environment{
+                RETRY = '60'
+            }
+            steps {
+                echo 'Deploying to Production'
+                sh 'apictl import-api -f $API -e $PROD_ENV -k --preserve-provider=false --update=true --verbose'
+            }
+        }
+    }
+    post {
+        cleanup {
+            deleteDir()
+            dir("${workspace}@tmp") {
+                deleteDir()
+            }
+            dir("${workspace}@script") {
+                deleteDir()
+            }
+        }
+    }
+}
