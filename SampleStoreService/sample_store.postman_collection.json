@@ -538,7 +538,7 @@
 		{
 			"id": "fb418e8e-03f6-4f15-b76c-a193f0bc6bf4",
 			"key": "baseUrl",
-			"value": "http://localhost:9090/samplestore",
+			"value": "http://dev.apim.wso2/samplestore",
 			"type": "string"
 		}
 	],
