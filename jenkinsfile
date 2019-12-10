@@ -5,7 +5,8 @@ pipeline {
         CI = 'true'
         API = './SampleStore'
         DEV_ENV = 'dev'
-        PROD_ENV = 'prod'        
+        PROD_ENV = 'prod'
+        TEST_SCRIPT_FILE = 'sample.store.dev.postman_collection.json'        
     }
     stages {
         stage('Preparation') {
@@ -20,18 +21,18 @@ pipeline {
                 RETRY = '80'
             }
             steps {
-                sh 'echo "Logging into $DEV_ENV"'
+                echo 'Logging into $DEV_ENV'
                 withCredentials([usernamePassword(credentialsId: 'apim_dev', usernameVariable: 'DEV_USERNAME', passwordVariable: 'DEV_PASSWORD')]) {
                     sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
                 }
-                echo 'Deploying to Dev'
+                echo 'Deploying to $DEV_ENV'
                 sh 'apictl import-api -f $API -e $DEV_ENV -k --preserve-provider=false --update=true --verbose'
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'echo "Running tests in $DEV_ENV"'
-                sh 'newman run ./SampleStore/sample.store.dev.postman_collection.json --insecure' 
+                echo 'Running tests in $DEV_ENV'
+                sh 'newman run $API_DIR/sample.store.dev.postman_collection.json --insecure' 
             }
         }
         stage('Deploy to Production') {
