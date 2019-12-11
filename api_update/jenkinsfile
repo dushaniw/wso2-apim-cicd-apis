@@ -38,9 +38,9 @@ pipeline {
                     sh 'apictl login $ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
                 }
                 echo 'Export from Dev'
-                sh 'apictl export-api --name $NAME --provider $PROVIDER --version $VERSION -e $ENV -k --verbose'
-                sh 'unzip $HOME/$API_CTL_EXPORTED_DIR/$ENV/$EXPORTED_API_ZIP'
                 sh '''#!/bin/bash +x
+                    apictl export-api --name $NAME --provider $PROVIDER --version $VERSION -e $ENV -k --verbose
+                    unzip $HOME/$API_CTL_EXPORTED_DIR/$ENV/$EXPORTED_API_ZIP
                     if [ -f "$API_DIR/$API_PARAMS_FILE" ] ; then
                         echo "$API_DIR/$API_PARAMS_FILE exists"
                         cp $API_DIR/$API_PARAMS_FILE ./$NAME-$VERSION
@@ -74,7 +74,7 @@ pipeline {
             }
             steps {
                 echo 'Deploying to Production'
-                sh 'apictl import-api -f $API_DIR -e $ENV -k --preserve-provider=true --update=true --verbose'
+                sh 'apictl import-api -f $API_DIR -e $ENV -k --preserve-provider --update --verbose'
             }
         }
     }

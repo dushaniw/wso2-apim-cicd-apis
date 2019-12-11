@@ -26,7 +26,7 @@ pipeline {
                     sh 'apictl login $DEV_ENV -u $DEV_USERNAME -p $DEV_PASSWORD -k'                        
                 }
                 echo 'Deploying to $DEV_ENV'
-                sh 'apictl import-api -f $API_DIR -e $DEV_ENV -k --preserve-provider=true --update=true --verbose'
+                sh 'apictl import-api -f $API_DIR -e $DEV_ENV -k --preserve-provider --update --verbose'
             }
         }
         stage('Run Tests') {
@@ -45,7 +45,7 @@ pipeline {
                     sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                        
                 }
                 echo 'Deploying to Production'
-                sh 'apictl import-api -f $API_DIR -e $PROD_ENV -k --preserve-provider=true --update=true --verbose'
+                sh 'apictl import-api -f $API_DIR -e $PROD_ENV -k --preserve-provider --update --verbose'
             }
         }
     }
